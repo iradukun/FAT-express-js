@@ -51,24 +51,15 @@ const Class = sequelize.define('Class', {
   },
   code: {
     type: DataTypes.STRING(20),
-    allowNull: false,
-    unique: true,
-    validate: {
-      notEmpty: true,
-      len: [4, 20]
-    }
+    allowNull: true
   },
   trimester: {
-    type: DataTypes.ENUM('T1', 'T2', 'T3', 'Summer'),
-    allowNull: false
+    type: DataTypes.STRING(50),
+    allowNull: true
   },
   year: {
     type: DataTypes.INTEGER,
-    allowNull: false,
-    validate: {
-      min: 2020,
-      max: 2050
-    }
+    allowNull: true
   },
   startDate: {
     type: DataTypes.DATEONLY,

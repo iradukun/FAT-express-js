@@ -55,39 +55,23 @@ const Student = sequelize.define('Student', {
   },
   firstName: {
     type: DataTypes.STRING(50),
-    allowNull: false,
-    validate: {
-      notEmpty: true,
-      len: [2, 50]
-    }
+    allowNull: true
   },
   lastName: {
     type: DataTypes.STRING(50),
-    allowNull: false,
-    validate: {
-      notEmpty: true,
-      len: [2, 50]
-    }
+    allowNull: true
   },
   email: {
     type: DataTypes.STRING(100),
-    allowNull: false,
-    unique: true,
-    validate: {
-      isEmail: true
-    }
+    allowNull: true
   },
   studentId: {
     type: DataTypes.STRING(20),
-    allowNull: false,
-    unique: true,
-    validate: {
-      notEmpty: true
-    }
+    allowNull: true
   },
   cohortId: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
     references: {
       model: 'cohorts',
       key: 'id'

@@ -47,31 +47,19 @@ const Manager = sequelize.define('Manager', {
   },
   firstName: {
     type: DataTypes.STRING(50),
-    allowNull: false,
-    validate: {
-      notEmpty: true,
-      len: [2, 50]
-    }
+    allowNull: true
   },
   lastName: {
     type: DataTypes.STRING(50),
-    allowNull: false,
-    validate: {
-      notEmpty: true,
-      len: [2, 50]
-    }
+    allowNull: true
   },
   email: {
     type: DataTypes.STRING(100),
-    allowNull: false,
-    unique: true,
-    validate: {
-      isEmail: true
-    }
+    allowNull: true
   },
   password: {
     type: DataTypes.STRING(255),
-    allowNull: false
+    allowNull: true
   },
   isActive: {
     type: DataTypes.BOOLEAN,

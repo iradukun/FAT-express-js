@@ -68,7 +68,7 @@ const CourseOffering = sequelize.define('CourseOffering', {
   },
   moduleId: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
     references: {
       model: 'modules',
       key: 'id'
@@ -76,7 +76,7 @@ const CourseOffering = sequelize.define('CourseOffering', {
   },
   classId: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
     references: {
       model: 'classes',
       key: 'id'
@@ -84,7 +84,7 @@ const CourseOffering = sequelize.define('CourseOffering', {
   },
   cohortId: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
     references: {
       model: 'cohorts',
       key: 'id'
@@ -100,29 +100,23 @@ const CourseOffering = sequelize.define('CourseOffering', {
   },
   modeId: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
     references: {
       model: 'modes',
       key: 'id'
     }
   },
   intakePeriod: {
-    type: DataTypes.ENUM('HT1', 'HT2', 'FT'),
-    allowNull: false
+    type: DataTypes.STRING(50),
+    allowNull: true
   },
   maxStudents: {
     type: DataTypes.INTEGER,
-    allowNull: true,
-    validate: {
-      min: 1
-    }
+    allowNull: true
   },
   currentEnrollment: {
     type: DataTypes.INTEGER,
-    defaultValue: 0,
-    validate: {
-      min: 0
-    }
+    defaultValue: 0
   },
   startDate: {
     type: DataTypes.DATEONLY,

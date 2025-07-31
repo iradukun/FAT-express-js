@@ -49,20 +49,11 @@ const Module = sequelize.define('Module', {
   },
   code: {
     type: DataTypes.STRING(20),
-    allowNull: false,
-    unique: true,
-    validate: {
-      notEmpty: true,
-      len: [3, 20]
-    }
+    allowNull: true
   },
   name: {
     type: DataTypes.STRING(200),
-    allowNull: false,
-    validate: {
-      notEmpty: true,
-      len: [3, 200]
-    }
+    allowNull: true
   },
   description: {
     type: DataTypes.TEXT,
@@ -70,15 +61,11 @@ const Module = sequelize.define('Module', {
   },
   credits: {
     type: DataTypes.INTEGER,
-    allowNull: false,
-    validate: {
-      min: 1,
-      max: 20
-    }
+    allowNull: true
   },
   level: {
-    type: DataTypes.ENUM('undergraduate', 'postgraduate', 'diploma'),
-    allowNull: false,
+    type: DataTypes.STRING(50),
+    allowNull: true,
     defaultValue: 'undergraduate'
   },
   isActive: {

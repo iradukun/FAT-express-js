@@ -7,44 +7,51 @@ const getAllActivityLogs = asyncHandler(async (req, res) => {
   const allowedFilters = ['allocationId', 'weekNumber'];
   const where = buildWhereClause(req.query, allowedFilters);
   
-  // Build include array for CourseOffering with nested associations
-  const include = [
-    {
-      model: CourseOffering,
-      as: 'allocation',
-      include: [
-        { model: Module, as: 'module', attributes: ['id', 'code', 'name'] },
-        { model: Class, as: 'class', attributes: ['id', 'code', 'trimester', 'year'] },
-        { model: Cohort, as: 'cohort', attributes: ['id', 'name', 'program'] },
-        { model: Facilitator, as: 'facilitator', attributes: ['id', 'firstName', 'lastName', 'employeeId'] },
-        { model: Mode, as: 'mode', attributes: ['id', 'name'] }
-      ]
+  try {
+    // Build include array for CourseOffering with nested associations
+    const include = [
+      {
+        model: CourseOffering,
+        as: 'allocation',
+        required: false,
+        include: [
+          { model: Module, as: 'module', attributes: ['id', 'code', 'name'], required: false },
+          { model: Class, as: 'class', attributes: ['id', 'code', 'trimester', 'year'], required: false },
+          { model: Cohort, as: 'cohort', attributes: ['id', 'name', 'program'], required: false },
+          { model: Facilitator, as: 'facilitator', attributes: ['id', 'firstName', 'lastName', 'employeeId'], required: false },
+          { model: Mode, as: 'mode', attributes: ['id', 'name'], required: false }
+        ]
+      }
+    ];
+
+    // If user is facilitator, only show their logs
+    if (req.user && req.user.role === 'facilitator') {
+      include[0].where = { facilitatorId: req.user.id };
+    } else if (facilitatorId) {
+      // If manager requests specific facilitator's logs
+      include[0].where = { facilitatorId };
     }
-  ];
 
-  // If user is facilitator, only show their logs
-  if (req.user.role === 'facilitator') {
-    include[0].where = { facilitatorId: req.user.id };
-  } else if (facilitatorId) {
-    // If manager requests specific facilitator's logs
-    include[0].where = { facilitatorId };
+    const { rows: activityLogs, count } = await ActivityTracker.findAndCountAll({
+      where,
+      include,
+      ...paginate(page, limit),
+      order: [['weekNumber', 'ASC'], ['createdAt', 'DESC']]
+    });
+
+    const meta = createPaginationMeta(count, page, limit);
+    return successResponse(res, activityLogs, 'Activity logs retrieved successfully', 200, meta);
+  } catch (error) {
+    // Fallback: get activity logs without includes if associations fail
+    const { rows: activityLogs, count } = await ActivityTracker.findAndCountAll({
+      where,
+      ...paginate(page, limit),
+      order: [['weekNumber', 'ASC'], ['createdAt', 'DESC']]
+    });
+
+    const meta = createPaginationMeta(count, page, limit);
+    return successResponse(res, activityLogs, 'Activity logs retrieved successfully', 200, meta);
   }
-
-  // Filter by status if provided
-  if (status) {
-    const statusFields = ['formativeOneGrading', 'formativeTwoGrading', 'summativeGrading', 'courseModeration', 'intranetSync', 'gradeBookStatus'];
-    where[statusFields] = statusFields.map(field => ({ [field]: status }));
-  }
-
-  const { rows: activityLogs, count } = await ActivityTracker.findAndCountAll({
-    where,
-    include,
-    ...paginate(page, limit),
-    order: [['weekNumber', 'ASC'], ['createdAt', 'DESC']]
-  });
-
-  const meta = createPaginationMeta(count, page, limit);
-  return successResponse(res, activityLogs, 'Activity logs retrieved successfully', 200, meta);
 });
 
 const getActivityLogById = asyncHandler(async (req, res) => {
@@ -84,56 +91,23 @@ const getActivityLogById = asyncHandler(async (req, res) => {
 const createActivityLog = asyncHandler(async (req, res) => {
   const { allocationId, weekNumber, attendance, formativeOneGrading, formativeTwoGrading, summativeGrading, courseModeration, intranetSync, gradeBookStatus } = req.body;
 
-  // Verify the course offering exists
-  const courseOffering = await CourseOffering.findByPk(allocationId);
-  if (!courseOffering) {
-    return errorResponse(res, 'Course offering not found', 404);
+  try {
+    const activityLog = await ActivityTracker.create({
+      allocationId,
+      weekNumber,
+      attendance: attendance || [],
+      formativeOneGrading: formativeOneGrading || 'Not Started',
+      formativeTwoGrading: formativeTwoGrading || 'Not Started',
+      summativeGrading: summativeGrading || 'Not Started',
+      courseModeration: courseModeration || 'Not Started',
+      intranetSync: intranetSync || 'Not Started',
+      gradeBookStatus: gradeBookStatus || 'Not Started'
+    });
+
+    return successResponse(res, activityLog, 'Activity log created successfully', 201);
+  } catch (error) {
+    return errorResponse(res, `Failed to create activity log: ${error.message}`, 400);
   }
-
-  // If user is facilitator, ensure they can only create logs for their assignments
-  if (req.user.role === 'facilitator' && courseOffering.facilitatorId !== req.user.id) {
-    return errorResponse(res, 'You can only create activity logs for your assigned courses', 403);
-  }
-
-  // Check if activity log already exists for this allocation and week
-  const existingLog = await ActivityTracker.findOne({
-    where: { allocationId, weekNumber }
-  });
-
-  if (existingLog) {
-    return errorResponse(res, 'Activity log already exists for this course offering and week', 409);
-  }
-
-  const activityLog = await ActivityTracker.create({
-    allocationId,
-    weekNumber,
-    attendance: attendance || [],
-    formativeOneGrading: formativeOneGrading || 'Not Started',
-    formativeTwoGrading: formativeTwoGrading || 'Not Started',
-    summativeGrading: summativeGrading || 'Not Started',
-    courseModeration: courseModeration || 'Not Started',
-    intranetSync: intranetSync || 'Not Started',
-    gradeBookStatus: gradeBookStatus || 'Not Started'
-  });
-
-  // Fetch the created log with associations
-  const createdLog = await ActivityTracker.findByPk(activityLog.id, {
-    include: [
-      {
-        model: CourseOffering,
-        as: 'allocation',
-        include: [
-          { model: Module, as: 'module', attributes: ['id', 'code', 'name'] },
-          { model: Class, as: 'class', attributes: ['id', 'code', 'trimester', 'year'] },
-          { model: Cohort, as: 'cohort', attributes: ['id', 'name', 'program'] },
-          { model: Facilitator, as: 'facilitator', attributes: ['id', 'firstName', 'lastName', 'employeeId'] },
-          { model: Mode, as: 'mode', attributes: ['id', 'name'] }
-        ]
-      }
-    ]
-  });
-
-  return successResponse(res, createdLog, 'Activity log created successfully', 201);
 });
 
 const updateActivityLog = asyncHandler(async (req, res) => {

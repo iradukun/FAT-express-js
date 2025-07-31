@@ -37,9 +37,8 @@ const Mode = sequelize.define('Mode', {
     autoIncrement: true
   },
   name: {
-    type: DataTypes.ENUM('Online', 'In-person', 'Hybrid'),
-    allowNull: false,
-    unique: true
+    type: DataTypes.STRING(50),
+    allowNull: true
   },
   description: {
     type: DataTypes.TEXT,

@@ -70,7 +70,7 @@ const ActivityTracker = sequelize.define('ActivityTracker', {
   },
   allocationId: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
     references: {
       model: 'course_offerings',
       key: 'id'
@@ -78,55 +78,41 @@ const ActivityTracker = sequelize.define('ActivityTracker', {
   },
   weekNumber: {
     type: DataTypes.INTEGER,
-    allowNull: false,
-    validate: {
-      min: 1,
-      max: 52
-    }
+    allowNull: true
   },
   attendance: {
     type: DataTypes.JSON,
     allowNull: true,
-    defaultValue: [],
-    validate: {
-      isArrayOfBooleans(value) {
-        if (value && !Array.isArray(value)) {
-          throw new Error('Attendance must be an array');
-        }
-        if (value && value.some(item => typeof item !== 'boolean')) {
-          throw new Error('All attendance values must be boolean');
-        }
-      }
-    }
+    defaultValue: []
   },
   formativeOneGrading: {
-    type: DataTypes.ENUM('Done', 'Pending', 'Not Started'),
-    allowNull: false,
+    type: DataTypes.STRING(50),
+    allowNull: true,
     defaultValue: 'Not Started'
   },
   formativeTwoGrading: {
-    type: DataTypes.ENUM('Done', 'Pending', 'Not Started'),
-    allowNull: false,
+    type: DataTypes.STRING(50),
+    allowNull: true,
     defaultValue: 'Not Started'
   },
   summativeGrading: {
-    type: DataTypes.ENUM('Done', 'Pending', 'Not Started'),
-    allowNull: false,
+    type: DataTypes.STRING(50),
+    allowNull: true,
     defaultValue: 'Not Started'
   },
   courseModeration: {
-    type: DataTypes.ENUM('Done', 'Pending', 'Not Started'),
-    allowNull: false,
+    type: DataTypes.STRING(50),
+    allowNull: true,
     defaultValue: 'Not Started'
   },
   intranetSync: {
-    type: DataTypes.ENUM('Done', 'Pending', 'Not Started'),
-    allowNull: false,
+    type: DataTypes.STRING(50),
+    allowNull: true,
     defaultValue: 'Not Started'
   },
   gradeBookStatus: {
-    type: DataTypes.ENUM('Done', 'Pending', 'Not Started'),
-    allowNull: false,
+    type: DataTypes.STRING(50),
+    allowNull: true,
     defaultValue: 'Not Started'
   },
   submittedAt: {

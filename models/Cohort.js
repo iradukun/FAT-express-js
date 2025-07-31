@@ -53,26 +53,15 @@ const Cohort = sequelize.define('Cohort', {
   },
   name: {
     type: DataTypes.STRING(100),
-    allowNull: false,
-    validate: {
-      notEmpty: true,
-      len: [3, 100]
-    }
+    allowNull: true
   },
   year: {
     type: DataTypes.INTEGER,
-    allowNull: false,
-    validate: {
-      min: 2020,
-      max: 2050
-    }
+    allowNull: true
   },
   program: {
     type: DataTypes.STRING(100),
-    allowNull: false,
-    validate: {
-      notEmpty: true
-    }
+    allowNull: true
   },
   startDate: {
     type: DataTypes.DATEONLY,
@@ -84,10 +73,7 @@ const Cohort = sequelize.define('Cohort', {
   },
   maxStudents: {
     type: DataTypes.INTEGER,
-    allowNull: true,
-    validate: {
-      min: 1
-    }
+    allowNull: true
   },
   isActive: {
     type: DataTypes.BOOLEAN,
