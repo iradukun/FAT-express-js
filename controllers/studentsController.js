@@ -74,76 +74,97 @@ const getStudentById = asyncHandler(async (req, res) => {
 });
 
 const createStudent = asyncHandler(async (req, res) => {
-  const { firstName, lastName, email, studentId, cohortId, enrollmentDate } = req.body;
-
-  const student = await Student.create({
-    firstName,
-    lastName,
-    email,
-    studentId,
-    cohortId,
-    enrollmentDate
-  });
-
-  // Include cohort information in response if cohortId exists
-  let studentWithCohort = student;
-  if (cohortId) {
-    try {
-      studentWithCohort = await Student.findByPk(student.id, {
-        include: [
-          {
-            model: Cohort,
-            as: 'cohort',
-            attributes: ['id', 'name', 'program', 'year']
-          }
-        ]
-      });
-    } catch (error) {
-      // If include fails, just return the student without cohort
-      studentWithCohort = student;
-    }
+  // Validate request body exists
+  if (!req.body || typeof req.body !== 'object') {
+    return errorResponse(res, 'Invalid request body. Please provide valid JSON data.', 400);
   }
 
-  return successResponse(res, studentWithCohort, 'Student created successfully', 201);
+  const { firstName, lastName, email, studentId, cohortId, enrollmentDate } = req.body;
+
+  try {
+    const student = await Student.create({
+      firstName,
+      lastName,
+      email,
+      studentId,
+      cohortId,
+      enrollmentDate
+    });
+
+    // Include cohort information in response if cohortId exists
+    let studentWithCohort = student;
+    if (cohortId) {
+      try {
+        studentWithCohort = await Student.findByPk(student.id, {
+          include: [
+            {
+              model: Cohort,
+              as: 'cohort',
+              attributes: ['id', 'name', 'program', 'year']
+            }
+          ]
+        });
+      } catch (error) {
+        // If include fails, just return the student without cohort
+        studentWithCohort = student;
+      }
+    }
+
+    return successResponse(res, studentWithCohort, 'Student created successfully', 201);
+  } catch (error) {
+    console.error('Error creating student:', error);
+    return errorResponse(res, 'Failed to create student: ' + error.message, 500);
+  }
 });
 
 const updateStudent = asyncHandler(async (req, res) => {
   const { id } = req.params;
+  
+  // Validate request body exists
+  if (!req.body || typeof req.body !== 'object') {
+    return errorResponse(res, 'Invalid request body. Please provide valid JSON data.', 400);
+  }
+  
   const { firstName, lastName, cohortId, enrollmentDate, isActive } = req.body;
 
-  const student = await Student.findByPk(id);
-  if (!student) {
-    return errorResponse(res, 'Student not found', 404);
-  }
-
-  await student.update({
-    firstName: firstName || student.firstName,
-    lastName: lastName || student.lastName,
-    cohortId: cohortId || student.cohortId,
-    enrollmentDate: enrollmentDate || student.enrollmentDate,
-    isActive: isActive !== undefined ? isActive : student.isActive
-  });
-
-  // Include cohort information in response if cohortId exists
-  let updatedStudent = student;
-  if (student.cohortId) {
-    try {
-      updatedStudent = await Student.findByPk(id, {
-        include: [
-          {
-            model: Cohort,
-            as: 'cohort',
-            attributes: ['id', 'name', 'program', 'year']
-          }
-        ]
-      });
-    } catch (error) {
-      // If include fails, just return the student without cohort
-      updatedStudent = student;
+  try {
+    const student = await Student.findByPk(id);
+    if (!student) {
+      return errorResponse(res, 'Student not found', 404);
     }
-  }
 
-  return successResponse(res, updatedStudent, 'Student updated successfully');
+    await student.update({
+      firstName: firstName || student.firstName,
+      lastName: lastName || student.lastName,
+      cohortId: cohortId || student.cohortId,
+      enrollmentDate: enrollmentDate || student.enrollmentDate,
+      isActive: isActive !== undefined ? isActive : student.isActive
+    });
+
+    // Include cohort information in response if cohortId exists
+    let updatedStudent = student;
+    if (student.cohortId) {
+      try {
+        updatedStudent = await Student.findByPk(id, {
+          include: [
+            {
+              model: Cohort,
+              as: 'cohort',
+              attributes: ['id', 'name', 'program', 'year']
+            }
+          ]
+        });
+      } catch (error) {
+        // If include fails, just return the student without cohort
+        updatedStudent = student;
+      }
+    }
+
+    return successResponse(res, updatedStudent, 'Student updated successfully');
+  } catch (error) {
+    console.error('Error updating student:', error);
+    return errorResponse(res, 'Failed to update student: ' + error.message, 500);
+  }
 });
 
 const deleteStudent = asyncHandler(async (req, res) => {

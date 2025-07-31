@@ -59,8 +59,18 @@ app.use('/api/', limiter);
 // Logging middleware
 app.use(morgan('combined'));
 
-// Body parsing middleware
-app.use(express.json({ limit: '10mb' }));
+// Body parsing middleware with better error handling
+app.use(express.json({ 
+  limit: '10mb',
+  verify: (req, res, buf, encoding) => {
+    try {
+      JSON.parse(buf);
+    } catch (e) {
+      console.error('JSON parsing error:', e.message);
+      console.error('Raw body:', buf.toString());
+    }
+  }
+}));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Static files middleware - serve frontend files
@@ -90,6 +100,24 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Custom middleware to handle JSON parsing errors
+app.use((req, res, next) => {
+  if (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH') {
+    // If there's a body but it's not parsed correctly, try to handle it
+    if (req.headers['content-type'] && req.headers['content-type'].includes('application/json')) {
+      // The body should already be parsed by express.json()
+      // If we reach here and req.body is undefined, there was likely a parsing error
+      if (req.body === undefined) {
+        return res.status(400).json({
+          message: 'Invalid JSON format',
+          error: 'Please ensure your JSON is properly formatted'
+        });
+      }
+    }
+  }
+  next();
+});
+
 // API Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/managers', require('./routes/managers'));
@@ -113,6 +141,15 @@ app.use('*', (req, res) => {
 // Global error handler
 app.use((err, req, res, next) => {
   console.error('Global error handler:', err);
+  
+  // JSON parsing errors
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({
+      message: 'Invalid JSON format',
+      error: 'Please check your JSON syntax. Common issues: missing quotes, trailing commas, or unescaped characters.',
+      details: err.message
+    });
+  }
   
   // CORS error
   if (err.message === 'Not allowed by CORS') {
