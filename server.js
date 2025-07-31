@@ -102,6 +102,7 @@ app.use('/api/cohorts', require('./routes/cohorts'));
 app.use('/api/classes', require('./routes/classes'));
 app.use('/api/course-offerings', require('./routes/courseOfferings'));
 app.use('/api/students', require('./routes/students'));
+app.use('/api/activity-logs', require('./routes/activityTracker'));
 
 // 404 handler
 app.use('*', (req, res) => {

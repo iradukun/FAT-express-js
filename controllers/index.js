@@ -6,6 +6,7 @@ const managersController = require('./managersController');
 const cohortsController = require('./cohortsController');
 const classesController = require('./classesController');
 const studentsController = require('./studentsController');
+const activityTrackerController = require('./activityTrackerController');
 
 module.exports = {
   authController,
@@ -15,5 +16,6 @@ module.exports = {
   managersController,
   cohortsController,
   classesController,
-  studentsController
+  studentsController,
+  activityTrackerController
 };

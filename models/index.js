@@ -9,6 +9,7 @@ const Class = require('./Class');
 const Student = require('./Student');
 const Mode = require('./Mode');
 const CourseOffering = require('./CourseOffering');
+const ActivityTracker = require('./ActivityTracker');
 
 // Define associations
 
@@ -68,6 +69,16 @@ Mode.hasMany(CourseOffering, {
   as: 'offerings'
 });
 
+// ActivityTracker associations
+ActivityTracker.belongsTo(CourseOffering, {
+  foreignKey: 'allocationId',
+  as: 'allocation'
+});
+CourseOffering.hasMany(ActivityTracker, {
+  foreignKey: 'allocationId',
+  as: 'activityLogs'
+});
+
 // Export all models and sequelize instance
 module.exports = {
   sequelize,
@@ -78,5 +89,6 @@ module.exports = {
   Class,
   Student,
   Mode,
-  CourseOffering
+  CourseOffering,
+  ActivityTracker
 };

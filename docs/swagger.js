@@ -11,6 +11,7 @@ const classesSwagger = require('./classes.swagger');
 const cohortsSwagger = require('./cohorts.swagger');
 const studentsSwagger = require('./students.swagger');
 const courseOfferingsSwagger = require('./courseOfferings.swagger');
+const activityTrackerSwagger = require('./activityTracker.swagger');
 
 const options = {
   definition: {
