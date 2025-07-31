@@ -14,6 +14,7 @@ const getAllStudents = asyncHandler(async (req, res) => {
     include: [
       {
         model: Cohort,
+        as: 'cohort',
         attributes: ['id', 'name', 'program', 'year']
       }
     ],
@@ -34,6 +35,7 @@ const getStudentById = asyncHandler(async (req, res) => {
     include: [
       {
         model: Cohort,
+        as: 'cohort',
         attributes: ['id', 'name', 'program', 'year', 'startDate', 'endDate']
       }
     ]
@@ -80,6 +82,7 @@ const createStudent = asyncHandler(async (req, res) => {
     include: [
       {
         model: Cohort,
+        as: 'cohort',
         attributes: ['id', 'name', 'program', 'year']
       }
     ]
@@ -118,6 +121,7 @@ const updateStudent = asyncHandler(async (req, res) => {
     include: [
       {
         model: Cohort,
+        as: 'cohort',
         attributes: ['id', 'name', 'program', 'year']
       }
     ]

@@ -14,6 +14,7 @@ const getAllCohorts = asyncHandler(async (req, res) => {
     include: [
       {
         model: Student,
+        as: 'students',
         attributes: [],
         required: false
       }
@@ -21,7 +22,7 @@ const getAllCohorts = asyncHandler(async (req, res) => {
     attributes: {
       include: [
         [
-          require('sequelize').fn('COUNT', require('sequelize').col('Students.id')),
+          require('sequelize').fn('COUNT', require('sequelize').col('students.id')),
           'studentCount'
         ]
       ]
@@ -45,6 +46,7 @@ const getCohortById = asyncHandler(async (req, res) => {
     include: [
       {
         model: Student,
+        as: 'students',
         attributes: ['id', 'firstName', 'lastName', 'email', 'studentId', 'enrollmentDate', 'isActive']
       }
     ]

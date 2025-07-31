@@ -63,6 +63,9 @@ app.use(morgan('combined'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Static files middleware - serve frontend files
+app.use(express.static('views'));
+
 // Swagger documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
   explorer: true,
@@ -71,15 +74,9 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
   customfavIcon: '/favicon.ico'
 }));
 
-// Root endpoint
+// Root endpoint - serve the main HTML file
 app.get('/', (req, res) => {
-  res.json({
-    message: 'Course Management System API',
-    version: '1.0.0',
-    documentation: '/api-docs',
-    health: '/health',
-    timestamp: new Date().toISOString()
-  });
+  res.sendFile(__dirname + '/views/index.html');
 });
 
 // Health check endpoint

@@ -45,10 +45,10 @@ const getFacilitatorAssignments = asyncHandler(async (req, res) => {
       isActive: true 
     },
     include: [
-      { model: Module, attributes: ['id', 'code', 'name', 'credits'] },
-      { model: Class, attributes: ['id', 'code', 'trimester', 'year'] },
-      { model: Cohort, attributes: ['id', 'name', 'program'] },
-      { model: Mode, attributes: ['id', 'name'] }
+      { model: Module, as: 'module', attributes: ['id', 'code', 'name', 'credits'] },
+      { model: Class, as: 'class', attributes: ['id', 'code', 'trimester', 'year'] },
+      { model: Cohort, as: 'cohort', attributes: ['id', 'name', 'program'] },
+      { model: Mode, as: 'mode', attributes: ['id', 'name'] }
     ],
     order: [['startDate', 'ASC']]
   });

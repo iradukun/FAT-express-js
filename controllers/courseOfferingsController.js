@@ -17,11 +17,11 @@ const getAllCourseOfferings = asyncHandler(async (req, res) => {
   const { count, rows: courseOfferings } = await CourseOffering.findAndCountAll({
     where,
     include: [
-      { model: Module, attributes: ['id', 'code', 'name', 'credits'] },
-      { model: Class, attributes: ['id', 'code', 'trimester', 'year'] },
-      { model: Cohort, attributes: ['id', 'name', 'program'] },
-      { model: Facilitator, attributes: ['id', 'firstName', 'lastName', 'employeeId'] },
-      { model: Mode, attributes: ['id', 'name'] }
+      { model: Module, as: 'module', attributes: ['id', 'code', 'name', 'credits'] },
+      { model: Class, as: 'class', attributes: ['id', 'code', 'trimester', 'year'] },
+      { model: Cohort, as: 'cohort', attributes: ['id', 'name', 'program'] },
+      { model: Facilitator, as: 'facilitator', attributes: ['id', 'firstName', 'lastName', 'employeeId'] },
+      { model: Mode, as: 'mode', attributes: ['id', 'name'] }
     ],
     limit: queryLimit,
     offset,
@@ -46,11 +46,11 @@ const getCourseOfferingById = asyncHandler(async (req, res) => {
   const courseOffering = await CourseOffering.findOne({
     where,
     include: [
-      { model: Module, attributes: ['id', 'code', 'name', 'description', 'credits', 'level'] },
-      { model: Class, attributes: ['id', 'code', 'trimester', 'year', 'startDate', 'endDate'] },
-      { model: Cohort, attributes: ['id', 'name', 'program', 'year'] },
-      { model: Facilitator, attributes: ['id', 'firstName', 'lastName', 'employeeId', 'department'] },
-      { model: Mode, attributes: ['id', 'name', 'description'] }
+      { model: Module, as: 'module', attributes: ['id', 'code', 'name', 'description', 'credits', 'level'] },
+      { model: Class, as: 'class', attributes: ['id', 'code', 'trimester', 'year', 'startDate', 'endDate'] },
+      { model: Cohort, as: 'cohort', attributes: ['id', 'name', 'program', 'year'] },
+      { model: Facilitator, as: 'facilitator', attributes: ['id', 'firstName', 'lastName', 'employeeId', 'department'] },
+      { model: Mode, as: 'mode', attributes: ['id', 'name', 'description'] }
     ]
   });
 
